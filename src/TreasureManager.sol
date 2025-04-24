@@ -91,8 +91,59 @@ contract TreasureManager is Initializable, AccessControlUpgradeable, ReentrancyG
     }
 
     function grantRewards(address tokenAddress, address granter, uint256 amount) external onlyTreasureManager {
-        require()
+        require(address(tokenAddress) != address(0) && granter != address(0), "Invalid address");
+        userRewardAmounts[granter][address(tokenAddress)] += amount;
+        emit GrantRewardTokenAmount(address(tokenAddress), granter, amount);
     }
+
+    function claimAllTokens() external {
+        for (uint256 i = 0; i < tokenWhiteList.length; i++) {
+            address tokenAddress = tokenWhiteList[i];
+            uint256 rewardAmount = userRewardAmounts[msg.sender][tokenAddress];
+            if (rewardAmount > 0) {
+                if (tokenAddress == ethAddress) {
+                    (bool success, ) = msg.sender.call{value: rewardAmount}("");
+                    require(success, "ETH transfer failed");
+                } else {
+                    IERC20(tokenAddress).safeTransfer(msg.sender, rewardAmount);
+                }
+                userRewardAmounts[msg.sender][tokenAddress] = 0;
+                tokenBalances[tokenAddress] -= rewardAmount;
+            }
+        }
+    }
+
+    function claimToken(address tokenAddress) external {
+        require(tokenAddress != address(0), "Invalid token address");
+        uint256 rewardAmount = userRewardAmounts[msg.sender][tokenAddress];
+        require(rewardAmount > 0, "No reward available");
+        if (tokenAddress == ethAddress) {
+            (bool success, ) = msg.sender.call{value: rewardAmount}("");
+            require(success, "ETH transfer failed");
+        } else {
+            IERC20(tokenAddress).safeTransfer(msg.sender, rewardAmount);
+        }
+        userRewardAmounts[msg.sender][tokenAddress] = 0;
+        tokenBalances[tokenAddress] -= rewardAmount;
+    }
+
+    function withdrawETH(address payable withdrawAddress, uint256 amount) external payable onlyWithdrawManager returns (bools) {
+        require(address(this).balance >= amount, "Insufficient ETH balance in contract");
+        (bool success, ) = withdrawAddress.call{value: amount}("");
+        if (!success) {
+            return false;
+        }
+        tokenBalances[ethAddress] -= amount;
+        emit WithdrawToken(
+            ethAddress,
+            msg.sender,
+            withdrawAddress,
+            amount
+        );
+        return true;
+    }
+
+
 
 
 
