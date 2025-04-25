@@ -174,7 +174,7 @@ contract TreasureManager is Initializable, AccessControlUpgradeable, ReentrancyG
         );
     }
 
-    function queryReward(address _tokenAddress) public view returns (uint256) {
+    function queryRewards(address _tokenAddress) public view returns (uint256) {
         return userRewardAmounts[msg.sender][_tokenAddress];
     }
 
