@@ -10,9 +10,6 @@ function getValue() external pure returns(uint256) {
 }
 ```
 
-## Documentation
-
-https://book.getfoundry.sh/
 
 ## Usage
 
@@ -43,7 +40,7 @@ $ cast call --rpc-url 127.0.0.1:8545 0xe7f1725E7734CE288F8367e1Bb143E90bb3F0512 
 
 
 
-### 转账eth
+### 向合约转账eth
 
 ```shell
 $ cast send --rpc-url 127.0.0.1:8545 --private-key 0xac0974bec39a17e36ba4a6b4d238ff944bacb478cbed5efcae784d7bf4f2ff80 0xe7f1725E7734CE288F8367e1Bb143E90bb3F0512 --value 1000000000000000000
@@ -55,7 +52,6 @@ $ cast send --rpc-url 127.0.0.1:8545 --private-key 0xac0974bec39a17e36ba4a6b4d23
 ```shell
 $ cast call --rpc-url 127.0.0.1:8545 0xe7f1725E7734CE288F8367e1Bb143E90bb3F0512 "tokenBalances(address)(uint256)" 0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE
 ```
-
 
 
 ### 查看proxyadmin地址
@@ -80,26 +76,36 @@ $ forge script ./script/TreasureManagerScriptV2.s.sol:TreasureManagerScriptV2 --
 ### 测试升级函数
 
 ```shell
-cast call --rpc-url 127.0.0.1:8545 0xe7f1725E7734CE288F8367e1Bb143E90bb3F0512 "getValue()(uint256)"
+$ cast call --rpc-url 127.0.0.1:8545 0xe7f1725E7734CE288F8367e1Bb143E90bb3F0512 "getValue()(uint256)"
 ```
 
+### erc20 充值
+```shell
+0x5FC8d32690cc91D4c39d9d3abcBD16989F875707 为erc20 token合约
+$ cast call --rpc-url 127.0.0.1:8545 0x5FC8d32690cc91D4c39d9d3abcBD16989F875707 "balanceOf(address)(uint256)" 0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266
+$ cast send --rpc-url 127.0.0.1:8545 --private-key 0xac0974bec39a17e36ba4a6b4d238ff944bacb478cbed5efcae784d7bf4f2ff80 0x5FC8d32690cc91D4c39d9d3abcBD16989F875707 "approve(address,uint256)" 0xe7f1725E7734CE288F8367e1Bb143E90bb3F0512 100000000000000000
+$ cast send --rpc-url 127.0.0.1:8545 --private-key 0xac0974bec39a17e36ba4a6b4d238ff944bacb478cbed5efcae784d7bf4f2ff80 0xe7f1725E7734CE288F8367e1Bb143E90bb3F0512 "depositERC20(address,uint256)" 0x5FC8d32690cc91D4c39d9d3abcBD16989F875707 10000000000000000
+$ cast call --rpc-url 127.0.0.1:8545 0xe7f1725E7734CE288F8367e1Bb143E90bb3F0512 "tokenBalances(address)(uint256)" 0x5FC8d32690cc91D4c39d9d3abcBD16989F875707
+```
 
-# erc20 充值
-cast call --rpc-url 127.0.0.1:8545 0x5FC8d32690cc91D4c39d9d3abcBD16989F875707 "balanceOf(address)(uint256)" 0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266
-cast send --rpc-url 127.0.0.1:8545 --private-key 0xac0974bec39a17e36ba4a6b4d238ff944bacb478cbed5efcae784d7bf4f2ff80 0x5FC8d32690cc91D4c39d9d3abcBD16989F875707 "approve(address,uint256)" 0xe7f1725E7734CE288F8367e1Bb143E90bb3F0512 100000000000000000
-cast send --rpc-url 127.0.0.1:8545 --private-key 0xac0974bec39a17e36ba4a6b4d238ff944bacb478cbed5efcae784d7bf4f2ff80 0xe7f1725E7734CE288F8367e1Bb143E90bb3F0512 "depositERC20(address,uint256)" 0x5FC8d32690cc91D4c39d9d3abcBD16989F875707 10000000000000000
-cast call --rpc-url 127.0.0.1:8545 0xe7f1725E7734CE288F8367e1Bb143E90bb3F0512 "tokenBalances(address)(uint256)" 0x5FC8d32690cc91D4c39d9d3abcBD16989F875707
-# grantRewards
-cast send --rpc-url 127.0.0.1:8545 --private-key 0xac0974bec39a17e36ba4a6b4d238ff944bacb478cbed5efcae784d7bf4f2ff80 0xe7f1725E7734CE288F8367e1Bb143E90bb3F0512 "grantRewards(address,address,uint256)" 0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE 0xf917286675f3d40515a38d42c90d27bb2e360c8d 1000000000000000000
-cast call --rpc-url 127.0.0.1:8545 0xe7f1725E7734CE288F8367e1Bb143E90bb3F0512 "queryRewards(address)(uint256)" 0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE --from 0xf917286675f3d40515a38d42c90d27bb2e360c8d
+### grantRewards
+```shell
+$ cast send --rpc-url 127.0.0.1:8545 --private-key 0xac0974bec39a17e36ba4a6b4d238ff944bacb478cbed5efcae784d7bf4f2ff80 0xe7f1725E7734CE288F8367e1Bb143E90bb3F0512 "grantRewards(address,address,uint256)" 0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE 0xf917286675f3d40515a38d42c90d27bb2e360c8d 1000000000000000000
+$ cast call --rpc-url 127.0.0.1:8545 0xe7f1725E7734CE288F8367e1Bb143E90bb3F0512 "queryRewards(address)(uint256)" 0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE --from 0xf917286675f3d40515a38d42c90d27bb2e360c8d
+```
 
-## 充值
-cast send --rpc-url 127.0.0.1:8545 --private-key 0xac0974bec39a17e36ba4a6b4d238ff944bacb478cbed5efcae784d7bf4f2ff80 0xf917286675f3d40515a38d42c90d27bb2e360c8d --value 1000000000000000000
+### 充值
+```shell
+0xf917286675f3d40515a38d42c90d27bb2e360c8d 为自己钱包地址
+$ cast send --rpc-url 127.0.0.1:8545 --private-key 0xac0974bec39a17e36ba4a6b4d238ff944bacb478cbed5efcae784d7bf4f2ff80 0xf917286675f3d40515a38d42c90d27bb2e360c8d --value 1000000000000000000
+```
+### eth balance
+```shell
+$ cast balance 0xf917286675f3d40515a38d42c90d27bb2e360c8d --rpc-url 127.0.0.1:8545
+```
 
-# eth balance
-cast balance 0xf917286675f3d40515a38d42c90d27bb2e360c8d --rpc-url 127.0.0.1:8545
-
-# claim
-
+### claim
+```shell
+0x01e76c7ccdc819ce1da90341545eba789b97e7740483434ce410849fb994615f 为0xf917286675f3d40515a38d42c90d27bb2e360c8d 钱包私钥
 cast send --rpc-url 127.0.0.1:8545 --private-key 0x01e76c7ccdc819ce1da90341545eba789b97e7740483434ce410849fb994615f 0xe7f1725E7734CE288F8367e1Bb143E90bb3F0512 "claimToken(address)" 0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE
-
+```
