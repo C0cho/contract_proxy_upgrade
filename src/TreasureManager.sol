@@ -60,7 +60,7 @@ contract TreasureManager is Initializable, AccessControlUpgradeable, ReentrancyG
     }
 
     function initialize(address _initialOwner, address _treasureManager, address _withdrawManager) public initializer {
-        treasureManager = _initialOwner;
+        treasureManager = _treasureManager;
         withdrawManager = _withdrawManager;
         _transferOwnership(_initialOwner);
     }
@@ -127,7 +127,7 @@ contract TreasureManager is Initializable, AccessControlUpgradeable, ReentrancyG
         tokenBalances[tokenAddress] -= rewardAmount;
     }
 
-    function withdrawETH(address payable withdrawAddress, uint256 amount) external payable onlyWithdrawManager returns (bools) {
+    function withdrawETH(address payable withdrawAddress, uint256 amount) external payable onlyWithdrawManager returns (bool) {
         require(address(this).balance >= amount, "Insufficient ETH balance in contract");
         (bool success, ) = withdrawAddress.call{value: amount}("");
         if (!success) {
@@ -143,8 +143,43 @@ contract TreasureManager is Initializable, AccessControlUpgradeable, ReentrancyG
         return true;
     }
 
+    function withdrawERC20(IERC20 tokenAddress, address withdrawAddress, uint256 amount) external onlyWithdrawManager returns (bool) {
+        require(tokenBalances[address(tokenAddress)] >= amount, "Insufficient token balance in contract");
+        tokenAddress.safeTransfer(withdrawAddress, amount);
+        tokenBalances[address(tokenAddress)] -= amount;
+        emit WithdrawToken(
+            address(tokenAddress),
+            msg.sender,
+            withdrawAddress,
+            amount
+        );
+        return true;
+    }
 
+    function setTokenWhiteList(address tokenAddress) external onlyTreasureManager {
+        if(tokenAddress == address(0)) {
+            revert IsZeroAddress();
+        }
+        tokenWhiteList.push(tokenAddress);
+    }
 
+    function getTokenWhiteList() external view returns (address[] memory) {
+        return tokenWhiteList;
+    }
 
+    function setWithdrawManager(address _withdrawManager) external onlyOwner {
+        withdrawManager = _withdrawManager;
+        emit WithdrawManagerUpdate(
+            withdrawManager
+        );
+    }
 
+    function queryReward(address _tokenAddress) public view returns (uint256) {
+        return userRewardAmounts[msg.sender][_tokenAddress];
+    }
+
+    //测试合约升级
+    function getValue() external pure returns(uint256) {
+        return 1;
+    }
 }

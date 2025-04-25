@@ -15,4 +15,6 @@ interface ITreasureManager {
     function setWithdrawManager(address _withdrawManager) external;
     function queryReward(address _tokenAddress) external view returns (uint256);
     function getTokenWhiteList() external view returns (address[] memory);
+    //测试合约升级
+    function getValue() external pure returns(uint256);
 }

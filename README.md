@@ -1,13 +1,14 @@
-## Foundry
+## 合约升级
 
-**Foundry is a blazing fast, portable and modular toolkit for Ethereum application development written in Rust.**
+TreasureManagerScript为部署脚本
+TreasureManagerScriptV2为升级脚本
 
-Foundry consists of:
-
--   **Forge**: Ethereum testing framework (like Truffle, Hardhat and DappTools).
--   **Cast**: Swiss army knife for interacting with EVM smart contracts, sending transactions and getting chain data.
--   **Anvil**: Local Ethereum node, akin to Ganache, Hardhat Network.
--   **Chisel**: Fast, utilitarian, and verbose solidity REPL.
+升级内容
+```
+function getValue() external pure returns(uint256) {
+    return 1;
+}
+```
 
 ## Documentation
 
@@ -21,46 +22,57 @@ https://book.getfoundry.sh/
 $ forge build
 ```
 
-### Test
-
-```shell
-$ forge test
-```
-
-### Format
-
-```shell
-$ forge fmt
-```
-
-### Gas Snapshots
-
-```shell
-$ forge snapshot
-```
-
 ### Anvil
 
 ```shell
 $ anvil
 ```
 
-### Deploy
+### 查看owner
 
 ```shell
-$ forge script script/Counter.s.sol:CounterScript --rpc-url <your_rpc_url> --private-key <your_private_key>
+$ cast call --rpc-url 127.0.0.1:8545 0xe7f1725E7734CE288F8367e1Bb143E90bb3F0512 "treasureManager()(address)"
+$ cast call --rpc-url 127.0.0.1:8545 0xe7f1725E7734CE288F8367e1Bb143E90bb3F0512 "owner()(address)"
 ```
 
-### Cast
+
+
+### 转账eth
 
 ```shell
-$ cast <subcommand>
+$ cast send --rpc-url 127.0.0.1:8545 --private-key 0xac0974bec39a17e36ba4a6b4d238ff944bacb478cbed5efcae784d7bf4f2ff80 0xe7f1725E7734CE288F8367e1Bb143E90bb3F0512 --value 1000000000000000000
+
 ```
 
-### Help
+### 查看合约eth
 
 ```shell
-$ forge --help
-$ anvil --help
-$ cast --help
+$ cast call --rpc-url 127.0.0.1:8545 0xe7f1725E7734CE288F8367e1Bb143E90bb3F0512 "tokenBalances(address)(uint256)" 0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE
+```
+
+
+
+### 查看proxyadmin地址
+
+```shell
+$ cast storage 0xe7f1725E7734CE288F8367e1Bb143E90bb3F0512 0xb53127684a568b3173ae13b9f8a6016e243e63b6e8ee1178d6a717850b5d6103 --rpc-url 127.0.0.1:8545
+
+0x000000000000000000000000cafac3dd18ac6c6e92c921884f9e4176737c052c
+```
+
+### 判断是否为合约
+
+```shell
+$ cast code 0xe7f1725E7734CE288F8367e1Bb143E90bb3F0512 --rpc-url 127.0.0.1:8545
+```
+
+### 合约升级
+```shell
+$ forge script ./script/TreasureManagerScriptV2.s.sol:TreasureManagerScriptV2 --rpc-url 127.0.0.1:8545 --private-key 0xac0974bec39a17e36ba4a6b4d238ff944bacb478cbed5efcae784d7bf4f2ff80 --broadcast
+```
+
+### 测试升级函数
+
+```shell
+cast call --rpc-url 127.0.0.1:8545 0xe7f1725E7734CE288F8367e1Bb143E90bb3F0512 "getValue()(uint256)"
 ```
